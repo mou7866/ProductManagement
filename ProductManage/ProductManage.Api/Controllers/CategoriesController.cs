@@ -9,6 +9,7 @@ public static class CategoriesController
     public static void MapCategoryEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/categories")
+                       .AddEndpointFilter<GlobalValidationFilter>()
                        .WithTags("Categories");
 
         group.MapGet("/", GetAllCategories).WithName("GetAllCategories");

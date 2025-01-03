@@ -9,6 +9,7 @@ public static class ProductsController
     public static void MapProductEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/products")
+                       .AddEndpointFilter<GlobalValidationFilter>()
                        .WithTags("Products");
 
         group.MapGet("/", GetAllProducts).WithName("GetAllProducts");

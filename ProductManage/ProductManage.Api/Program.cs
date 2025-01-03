@@ -21,10 +21,7 @@ builder.Services.AddDbContext<ProductManagementDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-builder.Services.AddTransient<IValidator<CreateProductDto>, CreateProductRequestValidator>();
-builder.Services.AddTransient<IValidator<UpdateProductDto>, UpdateProductRequestValidator>();
-builder.Services.AddTransient<IValidator<CreateCategoryDto>, CreateCategoryDtoValidator>();
-builder.Services.AddTransient<IValidator<UpdateCategoryDto>, UpdateCategoryDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateProductRequestValidator>();
 
 builder.Services.AddCors(options =>
 {
