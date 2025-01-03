@@ -1,0 +1,63 @@
+version: '3.8'
+
+volumes:
+  postgres_data:
+    driver: local
+
+services:
+  liquibase:
+    image: liquibase/liquibase
+    container_name: liquibase
+    volumes:
+      - ./changelog:/liquibase/changelog
+    environment:
+      URL: jdbc:postgresql://host.docker.internal:5435/ProductManagementDB
+      USERNAME: postgres
+      PASSWORD: postgres
+      CHANGELOG_FILE: changelog.xml
+    depends_on:
+      - postgresql
+    networks:
+      - backend-network
+
+  postgresql:
+    image: postgres
+    container_name: postgresql
+    ports:
+      - '5435:5435'
+    environment:
+      POSTGRES_DB: ProductManagementDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - backend-network
+      
+  redis:
+    image: redis
+    networks:
+      - backend-network
+    ports:
+      - '6381:6381'
+
+  api:
+    build:
+      context: ProductManage.Api
+      dockerfile: Dockerfile
+    container_name: product_api
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: User ID=postgres;Password=postgres;Host=host.docker.internal;Port=5435;Database=ProductManagementDB;Pooling=true;Include Error Detail=true
+    depends_on:
+      - postgresql
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge

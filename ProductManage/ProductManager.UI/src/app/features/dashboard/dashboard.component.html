@@ -1,0 +1,12 @@
+<div class="grid grid-cols-2 gap-6 p-6">
+  <p-card header="Total Products" class="shadow-lg">
+    <h2 class="text-3xl font-bold">{{ totalProducts }}</h2>
+  </p-card>
+  <p-card header="Total Categories" class="shadow-lg">
+    <h2 class="text-3xl font-bold">{{ totalCategories }}</h2>
+  </p-card>
+</div>
+
+<div class="p-6">
+  <p-chart type="pie" [data]="chartData"></p-chart>
+</div>
