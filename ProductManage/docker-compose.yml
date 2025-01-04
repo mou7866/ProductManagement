@@ -11,7 +11,7 @@ services:
     volumes:
       - ./changelog:/liquibase/changelog
     environment:
-      URL: jdbc:postgresql://host.docker.internal:5435/ProductManagementDB
+      URL: jdbc:postgresql://postgresql:5432/ProductManagementDB
       USERNAME: postgres
       PASSWORD: postgres
       CHANGELOG_FILE: changelog.xml
@@ -24,7 +24,7 @@ services:
     image: postgres
     container_name: postgresql
     ports:
-      - '5435:5435'
+      - '5435:5432'
     environment:
       POSTGRES_DB: ProductManagementDB
       POSTGRES_USER: postgres
@@ -40,21 +40,33 @@ services:
     networks:
       - backend-network
     ports:
-      - '6381:6381'
+      - '6381:6379'
 
   api:
     build:
-      context: ProductManage.Api
-      dockerfile: Dockerfile
+        context: .
+        dockerfile: ProductManage.Api/Dockerfile
     container_name: product_api
     ports:
-      - "5000:5000"
-      - "5001:5001"
+        - "5000:5000"
+        - "5001:5001"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: User ID=postgres;Password=postgres;Host=host.docker.internal;Port=5435;Database=ProductManagementDB;Pooling=true;Include Error Detail=true
+        ASPNETCORE_ENVIRONMENT: Development
+        ConnectionStrings__DefaultConnection: User ID=postgres;Password=postgres;Host=postgresql;Port=5432;Database=ProductManagementDB;Pooling=true;Include Error Detail=true
     depends_on:
-      - postgresql
+        - postgresql
+    networks:
+        - backend-network
+
+  angular-ui:
+    build:
+      context: ./ProductManager.UI
+      dockerfile: Dockerfile
+    container_name: product_ui
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
     networks:
       - backend-network
 

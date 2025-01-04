@@ -50,6 +50,6 @@ public static class CategoriesController
     private static async Task<IResult> DeleteCategory([FromServices] ICategoriesService manageCategoriesService, Guid id)
     {
         var deleted = await manageCategoriesService.DeleteCategoryAsync(id);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        return deleted ? Results.NoContent() : Results.Conflict();
     }
 }

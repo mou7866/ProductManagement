@@ -66,6 +66,11 @@ public class ProductRepository(ProductManagementDBContext productManagementDBCon
             ? productManagementDBContext.Products.OrderBy(p => p.Name)
             : productManagementDBContext.Products.OrderByDescending(p => p.Name);
 
+        if (page <= 0 || pageSize <= 0)
+        {
+            throw new ArgumentException("Page and pageSize must be greater than zero.");
+        }
+
         return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
     }
 

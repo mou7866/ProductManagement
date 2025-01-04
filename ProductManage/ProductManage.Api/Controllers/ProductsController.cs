@@ -51,6 +51,6 @@ public static class ProductsController
     private static async Task<IResult> DeleteProduct([FromServices] IProductsService manageProductsService, Guid id)
     {
         var deleted = await manageProductsService.DeleteProductAsync(id);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        return deleted ? Results.NoContent() : Results.Conflict();
     }
 }

@@ -26,8 +26,7 @@ public class ProductsService(IProductRepository productRepository, ICategoryRepo
 
     public async Task<ProductDto> CreateProductAsync(CreateProductDto productDto)
     {
-        var category = await categoryRepository.GetByIdAsync(productDto.CategoryId);
-        if (category == null) throw new ArgumentException("Invalid category ID");
+        var category = await categoryRepository.GetByIdAsync(productDto.CategoryId) ?? throw new ArgumentException("Invalid category ID");
 
         var product = new Product
         {
@@ -36,7 +35,7 @@ public class ProductsService(IProductRepository productRepository, ICategoryRepo
             Description = productDto.Description,
             Price = productDto.Price,
             CategoryId = productDto.CategoryId,
-            Status = Enum.Parse<ProductStatus>(productDto.Status),
+            Status = productDto.Status,
             StockQuantity = productDto.StockQuantity,
             ImageUrl = productDto.ImageUrl,
             CreatedDate = DateTime.UtcNow,
@@ -61,16 +60,16 @@ public class ProductsService(IProductRepository productRepository, ICategoryRepo
     public async Task<bool> UpdateProductAsync(Guid id, UpdateProductDto productDto)
     {
         var product = await productRepository.GetByIdAsync(id);
+
         if (product == null) return false;
 
-        var category = await categoryRepository.GetByIdAsync(productDto.CategoryId);
-        if (category == null) throw new ArgumentException("Invalid category ID");
+        _ = await categoryRepository.GetByIdAsync(productDto.CategoryId) ?? throw new ArgumentException("Invalid category ID");
 
         product.Name = productDto.Name;
         product.Description = productDto.Description;
         product.Price = productDto.Price;
         product.CategoryId = productDto.CategoryId;
-        product.Status = Enum.Parse<ProductStatus>(productDto.Status);
+        product.Status = productDto.Status;
         product.StockQuantity = productDto.StockQuantity;
         product.ImageUrl = productDto.ImageUrl;
         product.UpdatedDate = DateTime.UtcNow;

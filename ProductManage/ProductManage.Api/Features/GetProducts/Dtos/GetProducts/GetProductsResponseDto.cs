@@ -28,5 +28,7 @@ public class ProductDto
     public string? ImageUrl { get; set; }
 
     public string CategoryName { get; set; } = default!;
+
+    public Guid? CategoryId { get; set; }
 }
 

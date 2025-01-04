@@ -27,7 +27,7 @@ public class Product : Auditable
 
     [Required]
     [Column("status")]
-    public ProductStatus Status { get; set; } = ProductStatus.Active;
+    public string Status { get; set; } = ProductStatus.Active.ToString();
 
     [Required]
     [Range(0, int.MaxValue)]

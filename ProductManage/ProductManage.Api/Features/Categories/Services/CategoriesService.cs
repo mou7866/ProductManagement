@@ -54,7 +54,7 @@ public class CategoriesService(ICategoryRepository categoryRepository, IProductR
 
         var products = await productRepository.GetByCategoryIdAsync(id);
 
-        if (products.Any()) throw new InvalidOperationException("Cannot delete category with existing products.");
+        if (products.Any()) return false;
 
         await categoryRepository.DeleteAsync(category);
 

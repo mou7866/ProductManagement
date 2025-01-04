@@ -1,0 +1,71 @@
+<div *ngIf="loading">Loading products...</div>
+
+<div *ngIf="!loading">
+  <button (click)="addProduct()">Add Product</button>
+
+  <table class="table-auto w-full border-collapse border border-gray-300">
+    <thead>
+      <tr>
+        <th class="border border-gray-300 px-4 py-2">Name</th>
+        <th class="border border-gray-300 px-4 py-2">Description</th>
+        <th class="border border-gray-300 px-4 py-2">Price</th>
+        <th class="border border-gray-300 px-4 py-2">Category</th>
+        <th class="border border-gray-300 px-4 py-2">Status</th>
+        <th class="border border-gray-300 px-4 py-2">Stock Quantity</th>
+        <th class="border border-gray-300 px-4 py-2">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products">
+        <td class="border border-gray-300 px-4 py-2">{{ product.name }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ product.description }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ product.price | currency }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ product.categoryName }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ product.status }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ product.stockQuantity }}</td>
+        <td class="border border-gray-300 px-4 py-2">
+          <button (click)="editProduct(product)">Edit</button>
+          <button (click)="deleteProduct(product.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="showForm" class="mt-4">
+    <h3>{{ isEditMode ? 'Edit Product' : 'Add Product' }}</h3>
+    <form [formGroup]="form" (ngSubmit)="saveProduct()">
+      <label>
+        Name:
+        <input formControlName="name" type="text" />
+      </label>
+      <label>
+        Description:
+        <input formControlName="description" type="text" />
+      </label>
+      <label>
+        Price:
+        <input formControlName="price" type="number" />
+      </label>
+      <label>
+        Category:
+        <select formControlName="categoryId">
+          <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+        </select>
+      </label>
+      <label>
+        Status:
+        <input formControlName="status" type="text" />
+      </label>
+      <label>
+        Stock Quantity:
+        <input formControlName="stockQuantity" type="number" />
+      </label>
+      <label>
+        Image URL:
+        <input formControlName="imageUrl" type="text" />
+      </label>
+      <button type="submit">{{ isEditMode ? 'Update' : 'Create' }}</button>
+      <button type="button" (click)="cancel()">Cancel</button>
+    </form>
+  </div>
+</div>

@@ -27,16 +27,17 @@ public class GetProductsService(IProductRepository productRepository) : IGetProd
             search: request.Search
         );
 
-        var productDtos = products.Select(p => new ProductDto
+        var productDtos = products.Select(product => new ProductDto
         {
-            Id = p.Id,
-            Name = p.Name,
-            Description = p.Description,
-            Price = p.Price,
-            Status = p.Status.ToString(),
-            StockQuantity = p.StockQuantity,
-            ImageUrl = p.ImageUrl,
-            CategoryName = p.Category?.Name ?? "Unknown"
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            Status = product.Status.ToString(),
+            StockQuantity = product.StockQuantity,
+            ImageUrl = product.ImageUrl,
+            CategoryName = product.Category?.Name ?? "Unknown",
+            CategoryId = product.CategoryId
         }).ToList();
 
         return new GetProductsResponseDto
@@ -63,7 +64,8 @@ public class GetProductsService(IProductRepository productRepository) : IGetProd
             Status = product.Status.ToString(),
             StockQuantity = product.StockQuantity,
             ImageUrl = product.ImageUrl,
-            CategoryName = product.Category?.Name ?? "Unknown"
+            CategoryName = product.Category?.Name ?? "Unknown",
+            CategoryId = product.CategoryId
         };
     }
 }
