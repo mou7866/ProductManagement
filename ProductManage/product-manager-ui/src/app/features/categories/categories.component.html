@@ -1,53 +1,95 @@
-<div *ngIf="loading">Loading categories...</div>
+<div class="container mx-auto p-6">
+  <!-- Add Category Button -->
+    <!-- Add Category Button -->
+    <button (click)="addCategory()" class="btn btn-primary">
+      Add Category
+    </button>
+    <!-- Loading Indicator -->
+  <div *ngIf="loading" class="text-center">
+    <p>Loading categories...</p>
+  </div>
 
-<div *ngIf="!loading">
-  <button class="btn btn-primary mb-4" (click)="addCategory()">Add Category</button>
+  <!-- Categories Table -->
+  <div *ngIf="!loading && categories.length" class="overflow-x-auto">
+    <table class="min-w-full border-collapse border border-gray-300">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border border-gray-300 px-4 py-2">Name</th>
+          <th class="border border-gray-300 px-4 py-2">Description</th>
+          <th class="border border-gray-300 px-4 py-2">Status</th>
+          <th class="border border-gray-300 px-4 py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of categories">
+          <td class="border border-gray-300 px-4 py-2">{{ category.name }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ category.description || 'N/A' }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ category.status }}</td>
+          <td class="border border-gray-300 px-4 py-2">
+            <div class="button-container">
+                <button 
+                (click)="editCategory(category)" 
+                class="btn btn-secondary">
+                Edit
+              </button>
+            
+              <!-- Delete Button -->
+              <button 
+                (click)="deleteCategory(category.id)" 
+                class="btn btn-danger">
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <table class="table-auto w-full border-collapse border border-gray-300">
-    <thead>
-      <tr>
-        <th class="border border-gray-300 px-4 py-2">Name</th>
-        <th class="border border-gray-300 px-4 py-2">Description</th>
-        <th class="border border-gray-300 px-4 py-2">Status</th>
-        <th class="border border-gray-300 px-4 py-2">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let category of categories">
-        <td class="border border-gray-300 px-4 py-2">{{ category.name }}</td>
-        <td class="border border-gray-300 px-4 py-2">{{ category.description }}</td>
-        <td class="border border-gray-300 px-4 py-2">{{ category.status }}</td>
-        <td class="border border-gray-300 px-4 py-2">
-          <button class="btn btn-sm btn-warning mr-2" (click)="editCategory(category)">Edit</button>
-          <button class="btn btn-sm btn-danger" (click)="deleteCategory(category.id)">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+  <!-- No Categories Message -->
+  <div *ngIf="!loading && !categories.length" class="text-center text-gray-600">
+    <p>No categories found.</p>
+  </div>
 
-<!-- Add/Edit Form -->
-<div *ngIf="showForm" class="mt-6">
-  <form [formGroup]="form" (ngSubmit)="saveCategory()">
-    <div class="mb-4">
-      <label for="name">Name</label>
-      <input id="name" type="text" formControlName="name" class="form-control" />
-    </div>
+  <!-- Add/Edit Category Form -->
+  <div *ngIf="showForm" class="max-w-lg mx-auto mt-6 p-6 border rounded shadow">
+    <h2 class="text-xl font-bold mb-4">{{ isEditMode ? 'Edit Category' : 'Add Category' }}</h2>
+    <form [formGroup]="form" (ngSubmit)="saveCategory()">
+      <div class="mb-4">
+        <label for="name" class="block text-sm font-medium">Name</label>
+        <input id="name" type="text" formControlName="name" class="w-full p-2 border rounded" />
+        <div *ngIf="form.controls['name'].invalid && form.controls['name'].touched" class="text-red-500 text-sm">
+          Name is required and must be less than 50 characters.
+        </div>
+      </div>
 
-    <div class="mb-4">
-      <label for="description">Description</label>
-      <textarea id="description" formControlName="description" class="form-control"></textarea>
-    </div>
+      <div class="mb-4">
+        <label for="description" class="block text-sm font-medium">Description</label>
+        <textarea id="description" formControlName="description" class="w-full p-2 border rounded"></textarea>
+        <div *ngIf="form.controls['description'].invalid && form.controls['description'].touched" class="text-red-500 text-sm">
+          Description must be less than 200 characters.
+        </div>
+      </div>
 
-    <div class="mb-4">
-      <label for="status">Status</label>
-      <select id="status" formControlName="status" class="form-control">
-        <option value="Active">Active</option>
-        <option value="Inactive">Inactive</option>
-      </select>
-    </div>
+      <div class="mb-4">
+        <label for="status" class="block text-sm font-medium">Status</label>
+        <select id="status" formControlName="status" class="w-full p-2 border rounded">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+        <div *ngIf="form.controls['status'].invalid && form.controls['status'].touched" class="text-red-500 text-sm">
+          Status is required.
+        </div>
+      </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <button type="button" class="btn btn-secondary ml-2" (click)="cancel()">Cancel</button>
-  </form>
+      <div class="flex justify-end gap-4">
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700" [disabled]="form.invalid">
+          Save
+        </button>
+        <button type="button" class="px-4 py-2 bg-gray-600 text-white rounded shadow hover:bg-gray-700" (click)="cancel()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

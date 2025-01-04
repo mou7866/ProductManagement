@@ -1,0 +1,58 @@
+.button, .add-button {
+  color: #ffffff; /* Ensure text is white on colored buttons */
+}
+
+.table th {
+  background-color: #007bff; /* Blue background for headers */
+  color: #ffffff;
+}
+.table tbody tr {
+  background-color: #f8f9fa; /* Light grey rows */
+}
+.container {
+  padding: 20px;
+  margin: 20px auto;
+  background-color: #f0f2f5; /* Light background for better contrast */
+}
+
+.button-container, .add-button-container {
+  margin: 20px 0;
+  text-align: center;
+}
+.button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 5px;
+}
+
+.button, .add-button {
+  background-color: #007bff; /* Blue background */
+  color: #ffffff; /* White text */
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button:hover, .add-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Add explicit border if necessary */
+.button, .add-button {
+  border: 1px solid #0056b3;
+}
+
+.button-container, .add-button-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.button + .button {
+  margin-left: 10px;
+}
+.table tbody tr td {
+  background-color: #ffffff;
+  color: #333333;
+}

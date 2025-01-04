@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../core/ApiService';
-import { CardModule } from 'primeng/card'; 
+import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
 import { CommonModule } from '@angular/common';
 
@@ -16,7 +16,7 @@ export class DashboardComponent implements OnInit {
   chartData: any;
   loading = false;
 
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
     this.fetchDashboardData();
@@ -58,7 +58,7 @@ export class DashboardComponent implements OnInit {
       datasets: [
         {
           data: Object.values(categories),
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
         }
       ]
     };

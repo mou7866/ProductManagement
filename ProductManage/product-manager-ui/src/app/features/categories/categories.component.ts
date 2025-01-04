@@ -5,19 +5,20 @@ import { Category } from '../models/category.model';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-categories',
   templateUrl: './categories.component.html',
-  styleUrls: ['categories.component.css'],
+  styleUrls: ['./categories.component.css'],
   imports: [CommonModule, ReactiveFormsModule]
 })
 export class CategoriesComponent implements OnInit {
   categories: Category[] = [];
-  loading: boolean = true;
-  showForm: boolean = false;
+  loading = false;
+  showForm = false;
   form: FormGroup;
-  isEditMode: boolean = false;
+  isEditMode = false;
   currentCategoryId: string | null = null;
   private readonly apiUrl = `${environment.apiUrl}/categories`;
 
@@ -35,15 +36,16 @@ export class CategoriesComponent implements OnInit {
 
   fetchCategories(): void {
     this.loading = true;
-    this.http.get<Category[]>(this.apiUrl).subscribe({
-      next: (data) => {
-        this.categories = data;
-        this.loading = false;
-      },
-      error: (err) => {
+    this.http.get<Category[]>(this.apiUrl).pipe(
+      catchError((err) => {
         console.error('Error fetching categories:', err);
+        alert('Failed to load categories. Please try again later.');
         this.loading = false;
-      }
+        return of([]);
+      })
+    ).subscribe((data) => {
+      this.categories = data;
+      this.loading = false;
     });
   }
 
@@ -76,45 +78,54 @@ export class CategoriesComponent implements OnInit {
   }
 
   private createCategory(category: Category): void {
-    this.http.post<Category>(this.apiUrl, category).subscribe({
-      next: () => {
+    this.http.post<Category>(this.apiUrl, category).pipe(
+      catchError((err) => {
+        console.error('Error adding category:', err);
+        alert('Failed to add category. Please try again.');
+        return of(null);
+      })
+    ).subscribe((result) => {
+      if (result) {
         this.fetchCategories();
         this.showForm = false;
-      },
-      error: (err) => {
-        console.error('Error adding category:', err);
       }
     });
   }
 
   private updateCategory(categoryId: string, category: Category): void {
-    this.http.put(`${this.apiUrl}/${categoryId}`, category).subscribe({
-      next: () => {
+    this.http.put(`${this.apiUrl}/${categoryId}`, category).pipe(
+      catchError((err) => {
+        console.error('Error updating category:', err);
+        alert('Failed to update category. Please try again.');
+        return of(null);
+      })
+    ).subscribe((result) => {
+      if (result) {
         this.fetchCategories();
         this.showForm = false;
-      },
-      error: (err) => {
-        console.error('Error updating category:', err);
       }
     });
   }
 
   deleteCategory(categoryId: string): void {
     if (!confirm('Are you sure you want to delete this category?')) return;
-  
-    this.http.delete(`${this.apiUrl}/${categoryId}`).subscribe({
-      next: () => {
-        this.fetchCategories();
-      },
-      error: (err) => {
+
+    this.http.delete(`${this.apiUrl}/${categoryId}`).pipe(
+      catchError((err) => {
         if (err.status === 409) {
           alert('This category cannot be deleted because it has associated products.');
         } else {
           console.error('Error deleting category:', err);
+          alert('Failed to delete category. Please try again.');
         }
+        return of(null);
+      })
+    ).subscribe((result) => {
+      if (result !== null) {
+        this.fetchCategories();
       }
     });
-  }  
+  }
 
   cancel(): void {
     this.showForm = false;

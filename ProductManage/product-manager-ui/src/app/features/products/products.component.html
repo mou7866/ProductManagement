@@ -1,71 +1,119 @@
-<div *ngIf="loading">Loading products...</div>
+<div class="container mx-auto p-6">
+  <!-- Add Product Button -->
+  <div class="flex justify-end mb-4">
+    <button (click)="onAdd()" class="btn btn-primary" style="background-color: #007bff; color: #ffffff;">Add Product</button>
+  </div>
 
-<div *ngIf="!loading">
-  <button (click)="addProduct()">Add Product</button>
+  <!-- Loading Indicator -->
+  <div *ngIf="loading$ | async" class="text-center">
+    <p>Loading products...</p>
+  </div>
 
-  <table class="table-auto w-full border-collapse border border-gray-300">
-    <thead>
-      <tr>
-        <th class="border border-gray-300 px-4 py-2">Name</th>
-        <th class="border border-gray-300 px-4 py-2">Description</th>
-        <th class="border border-gray-300 px-4 py-2">Price</th>
-        <th class="border border-gray-300 px-4 py-2">Category</th>
-        <th class="border border-gray-300 px-4 py-2">Status</th>
-        <th class="border border-gray-300 px-4 py-2">Stock Quantity</th>
-        <th class="border border-gray-300 px-4 py-2">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let product of products">
-        <td class="border border-gray-300 px-4 py-2">{{ product.name }}</td>
-        <td class="border border-gray-300 px-4 py-2">{{ product.description }}</td>
-        <td class="border border-gray-300 px-4 py-2">{{ product.price | currency }}</td>
-        <td class="border border-gray-300 px-4 py-2">{{ product.categoryName }}</td>
-        <td class="border border-gray-300 px-4 py-2">{{ product.status }}</td>
-        <td class="border border-gray-300 px-4 py-2">{{ product.stockQuantity }}</td>
-        <td class="border border-gray-300 px-4 py-2">
-          <button (click)="editProduct(product)">Edit</button>
-          <button (click)="deleteProduct(product.id)">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Product List Table -->
+  <div *ngIf="!(loading$ | async)" class="overflow-x-auto">
+    <table class="min-w-full border-collapse border border-gray-300">
+      <thead>
+        <tr>
+          <th class="border border-gray-300 px-4 py-2">Name</th>
+          <th class="border border-gray-300 px-4 py-2">Description</th>
+          <th class="border border-gray-300 px-4 py-2">Price</th>
+          <th class="border border-gray-300 px-4 py-2">Category</th>
+          <th class="border border-gray-300 px-4 py-2">Status</th>
+          <th class="border border-gray-300 px-4 py-2">Stock Quantity</th>
+          <th class="border border-gray-300 px-4 py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of products$ | async">
+          <td class="border border-gray-300 px-4 py-2">{{ product.name }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ product.description }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ product.price | currency }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ product.categoryName }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ product.status }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ product.stockQuantity }}</td>
+          <td class="border border-gray-300 px-4 py-2">
+            <button (click)="onEdit(product)" class="btn btn-secondary">Edit</button>
+            <button (click)="onDelete(product.id)" class="btn btn-danger">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <div *ngIf="showForm" class="mt-4">
-    <h3>{{ isEditMode ? 'Edit Product' : 'Add Product' }}</h3>
-    <form [formGroup]="form" (ngSubmit)="saveProduct()">
-      <label>
-        Name:
-        <input formControlName="name" type="text" />
-      </label>
-      <label>
-        Description:
-        <input formControlName="description" type="text" />
-      </label>
-      <label>
-        Price:
-        <input formControlName="price" type="number" />
-      </label>
-      <label>
-        Category:
-        <select formControlName="categoryId">
-          <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+  <!-- Add/Edit Product Form -->
+  <div *ngIf="showForm" class="max-w-lg mx-auto mt-6 p-4 border rounded shadow">
+    <h2 class="text-xl font-bold mb-4">{{ isEditMode ? 'Edit Product' : 'Add Product' }}</h2>
+    <form [formGroup]="form" (ngSubmit)="onSave()">
+      <!-- Name Field -->
+      <div class="mb-4">
+        <label for="name" class="block text-sm font-medium">Name</label>
+        <input id="name" type="text" formControlName="name" class="w-full p-2 border rounded" />
+        <div *ngIf="form.controls['name'].invalid && form.controls['name'].touched" class="text-red-500 text-sm">
+          Name is required and must be less than 100 characters.
+        </div>
+      </div>
+
+      <!-- Description Field -->
+      <div class="mb-4">
+        <label for="description" class="block text-sm font-medium">Description</label>
+        <textarea id="description" formControlName="description" class="w-full p-2 border rounded"></textarea>
+        <div *ngIf="form.controls['description'].invalid && form.controls['description'].touched" class="text-red-500 text-sm">
+          Description is required and must be less than 500 characters.
+        </div>
+      </div>
+
+      <!-- Price Field -->
+      <div class="mb-4">
+        <label for="price" class="block text-sm font-medium">Price</label>
+        <input id="price" type="number" formControlName="price" class="w-full p-2 border rounded" />
+        <div *ngIf="form.controls['price'].invalid && form.controls['price'].touched" class="text-red-500 text-sm">
+          Price must be a positive number.
+        </div>
+      </div>
+
+      <!-- Category Field -->
+      <div class="mb-4">
+        <label for="categoryId" class="block text-sm font-medium">Category</label>
+        <select id="categoryId" formControlName="categoryId" class="w-full p-2 border rounded">
+          <option *ngFor="let category of categories$ | async" [value]="category.id">{{ category.name }}</option>
         </select>
-      </label>
-      <label>
-        Status:
-        <input formControlName="status" type="text" />
-      </label>
-      <label>
-        Stock Quantity:
-        <input formControlName="stockQuantity" type="number" />
-      </label>
-      <label>
-        Image URL:
-        <input formControlName="imageUrl" type="text" />
-      </label>
-      <button type="submit">{{ isEditMode ? 'Update' : 'Create' }}</button>
-      <button type="button" (click)="cancel()">Cancel</button>
+        <div *ngIf="form.controls['categoryId'].invalid && form.controls['categoryId'].touched" class="text-red-500 text-sm">
+          Please select a category.
+        </div>
+      </div>
+
+      <!-- Status Field -->
+      <div class="mb-4">
+        <label for="status" class="block text-sm font-medium">Status</label>
+        <select id="status" formControlName="status" class="w-full p-2 border rounded">
+          <option value="available">Available</option>
+          <option value="unavailable">Unavailable</option>
+        </select>
+        <div *ngIf="form.controls['status'].invalid && form.controls['status'].touched" class="text-red-500 text-sm">
+          Please select a status.
+        </div>
+      </div>
+
+      <!-- Stock Quantity Field -->
+      <div class="mb-4">
+        <label for="stockQuantity" class="block text-sm font-medium">Stock Quantity</label>
+        <input id="stockQuantity" type="number" formControlName="stockQuantity" class="w-full p-2 border rounded" />
+        <div *ngIf="form.controls['stockQuantity'].invalid && form.controls['stockQuantity'].touched" class="text-red-500 text-sm">
+          Stock quantity must be a positive number.
+        </div>
+      </div>
+
+      <!-- Image URL Field -->
+      <div class="mb-4">
+        <label for="imageUrl" class="block text-sm font-medium">Image URL</label>
+        <input id="imageUrl" type="text" formControlName="imageUrl" class="w-full p-2 border rounded" />
+      </div>
+
+      <!-- Form Buttons -->
+      <div class="flex justify-end gap-4">
+        <button type="submit"  class="btn btn-secondary" [disabled]="form.invalid">Save</button>
+        <button type="button" class="btn btn-danger" (click)="onCancel()">Cancel</button>
+      </div>
     </form>
   </div>
 </div>
