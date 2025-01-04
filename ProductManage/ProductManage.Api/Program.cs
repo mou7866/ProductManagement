@@ -2,7 +2,6 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ProductManage.Api.Controllers;
 using ProductManage.Api.Data;
-using ProductManage.Api.Dtos;
 using ProductManage.Api.Repositories;
 using ProductManage.Api.Services;
 using ProductManage.Api.Validators;
@@ -38,7 +37,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Product API V1");
+        c.RoutePrefix = string.Empty;
+    });
 }
 
 app.UseHttpsRedirection();

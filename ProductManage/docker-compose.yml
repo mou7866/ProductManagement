@@ -4,22 +4,12 @@ volumes:
   postgres_data:
     driver: local
 
-services:
-  liquibase:
-    image: liquibase/liquibase
-    container_name: liquibase
-    volumes:
-      - ./changelog:/liquibase/changelog
-    environment:
-      URL: jdbc:postgresql://postgresql:5432/ProductManagementDB
-      USERNAME: postgres
-      PASSWORD: postgres
-      CHANGELOG_FILE: changelog.xml
-    depends_on:
-      - postgresql
-    networks:
-      - backend-network
+networks:
+  backend-network:
+    name: backend-network
+    driver: bridge
 
+services:
   postgresql:
     image: postgres
     container_name: postgresql
@@ -35,6 +25,24 @@ services:
     networks:
       - backend-network
       
+  liquibase:
+    build:
+      context: .
+      dockerfile: ProductManage.Api/migrations.local.Dockerfile
+    container_name: product_manager_liquibase
+    volumes:
+      - ./changelog:/liquibase/changelog
+    environment:
+      URL: jdbc:postgresql://postgresql:5432/ProductManagementDB
+      USERNAME: postgres
+      PASSWORD: postgres
+      CHANGELOG_FILE: changelog/changelog.xml
+    working_dir: /liquibase/changelog
+    depends_on:
+      - postgresql
+    networks:
+      - backend-network   
+      
   redis:
     image: redis
     networks:
@@ -44,32 +52,40 @@ services:
 
   api:
     build:
-        context: .
-        dockerfile: ProductManage.Api/Dockerfile
+      context: .
+      dockerfile: ProductManage.Api/Dockerfile
     container_name: product_api
     ports:
-        - "5000:5000"
-        - "5001:5001"
+      - "5000:5000"
+      - "5001:5001"
     environment:
-        ASPNETCORE_ENVIRONMENT: Development
-        ConnectionStrings__DefaultConnection: User ID=postgres;Password=postgres;Host=postgresql;Port=5432;Database=ProductManagementDB;Pooling=true;Include Error Detail=true
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "5000" # Override the incorrect port
+      ConnectionStrings__DefaultConnection: User ID=postgres;Password=postgres;Host=postgresql;Port=5432;Database=ProductManagementDB;Pooling=true;Include Error Detail=true
     depends_on:
-        - postgresql
+      - postgresql
     networks:
-        - backend-network
+      - backend-network
+        
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@localhost.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postgresql
+    networks:
+      - backend-network
 
-  angular-ui:
+  ui:
     build:
-      context: ./ProductManager.UI
+      context: ./product-manager-ui
       dockerfile: Dockerfile
     container_name: product_ui
     ports:
       - "4200:80"
-    depends_on:
-      - api
     networks:
       - backend-network
-
-networks:
-  backend-network:
-    driver: bridge
